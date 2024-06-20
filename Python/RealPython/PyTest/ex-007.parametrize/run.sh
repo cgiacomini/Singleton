@@ -1,0 +1,1 @@
+pytest --durations=5 -vv

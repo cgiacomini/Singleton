@@ -1,0 +1,22 @@
+provider "aws" {
+  region = "eu-west-3"
+}
+
+resource "tls_private_key" "ssh_private_key" {
+  algorithm   = "RSA"
+  rsa_bits    = 2048
+}
+
+resource "aws_secretsmanager_secret" "ssh_private_key_secret" {
+  name = "my-cluster-ssh-private-key"
+}
+
+resource "aws_secretsmanager_secret_version" "ssh_private_key_secret_version" {
+  secret_id     = aws_secretsmanager_secret.ssh_private_key_secret.id
+  secret_string = tls_private_key.ssh_private_key.private_key_pem
+}
+
+output "ssh_private_key_secret_name" {
+  value = aws_secretsmanager_secret.ssh_private_key_secret.name
+}
+

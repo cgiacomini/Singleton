@@ -1,0 +1,64 @@
+# Configure the AWS provider with a variable for the region
+provider "aws" {
+  region = var.region
+}
+
+# Create a VPC with basic configuration
+resource "aws_vpc" "cgc_opensearch_vpc" {
+  cidr_block          = var.cidr_block
+  enable_dns_support  = true
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "Monitoring OpenSearch VPC"
+  }
+}
+
+# Create subnets in each availability zone
+resource "aws_subnet" "cgc_opensearch_subnet" {
+  count               = 3
+  vpc_id              = aws_vpc.cgc_opensearch_vpc.id
+  cidr_block          = cidrsubnet(aws_vpc.cgc_opensearch_vpc.cidr_block, 8, count.index)
+  availability_zone   = "us-west-2${count.index + 1}"
+
+  # Consider using a separate variable for public subnet configuration
+  # map_public_ip_on_launch = var.enable_public_subnet
+
+  tags = {
+    Name = format("cgc_opensearch_subnet-%d", count.index)
+  }
+}
+
+# Create internet gateway (optional, depends on your network design)
+resource "aws_internet_gateway" "cgc_opensearch_igw" {
+  vpc_id = aws_vpc.cgc_opensearch_vpc.id
+
+  tags = {
+    Name = "cgc_opensearch-igw"
+  }
+}
+
+# OpenSearch Serverless uses AWS Key Management Service (AWS KMS) to encrypt your data. 
+# The encryption is managed by an encryption policy.
+# Create an encryption security policy for OpenSearch Serverless data at rest
+resource "aws_opensearchserverless_encryption_policy" "cgc_opensearch_encryption_policy" {
+  type        = "encryption"
+  name        = "cgc-opensearch-encryption-policy"
+  description = "Default encryption policy for OpenSearch Serverless"
+
+  # Replace this with your KMS key ARN
+  kms_key_id = var.kms_key_arn
+}
+
+# Create an OpenSearch Serverless collection
+resource "aws_opensearchserverless_collection" "my_collection" {
+  name = "my-opensearch-collection"
+
+  # Reference the encryption security policy
+  encryption_policy {
+    name = aws_opensearchserverless_encryption_policy.base_policy.name
+  }
+
+  # (Optional) Additional configuration options for the collection
+}
+

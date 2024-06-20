@@ -1,0 +1,8 @@
+go env -w GO111MODULE=off
+GO111MODULE=off forces Go to behave the GOPATH way, even outside of GOPATH
+
+or 
+
+export GOPATH=`cygpath.exe -w $(pwd)`
+
+go test -coverprofile=coverage.out
