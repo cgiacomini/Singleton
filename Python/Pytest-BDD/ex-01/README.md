@@ -141,7 +141,8 @@ $ pytest tests/step_definitions/test_bank_transactions_param.py -v -s
 ```
 ## 3rd simple example (Scenario Outlines)
 Scenario Outlines allows you to specify parameters (called examples) in your feature file.
-Similar to Pytest Parametrization it allow to specify a set of input and expected result for the test. his is useful when you want to test the same behavior with various inputs and expected outcomes without writing redundant scenarios.
+Similar to Pytest Parametrization it allow to specify a set of input and expected result for the test. 
+It is useful when you want to test the same behavior with various inputs and expected outcomes without writing redundant scenarios.
 
 ```
 # tests/features/bank_transactions_scenario_outline.feature

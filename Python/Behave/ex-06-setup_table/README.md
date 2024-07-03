@@ -1,0 +1,1 @@
+Goal:	Use setup tables to simplify test setup.
